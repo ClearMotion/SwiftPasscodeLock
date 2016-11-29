@@ -24,6 +24,7 @@ public protocol PasscodeLockType {
 
 public protocol PasscodeLockTypeDelegate: class {
     
+    func passcodeLockDidSucceedWithCode(_ lock: PasscodeLockType, code: String)
     func passcodeLockDidSucceed(_ lock: PasscodeLockType)
     func passcodeLockDidFail(_ lock: PasscodeLockType)
     func passcodeLockDidChangeState(_ lock: PasscodeLockType)
