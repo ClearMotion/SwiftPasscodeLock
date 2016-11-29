@@ -29,8 +29,8 @@ struct SetPasscodeState: PasscodeLockStateType {
     
     func acceptPasscode(_ passcode: [String], fromLock lock: PasscodeLockType) {
         
-        let nextState = ConfirmPasscodeState(passcode: passcode)
-        
-        lock.changeStateTo(nextState)
+        let password = "\(passcode[0])\(passcode[1])\(passcode[2])\(passcode[3])"
+        lock.delegate?.passcodeLockDidSucceedWithCode(lock, code: password)
+
     }
 }
