@@ -34,7 +34,9 @@ open class PasscodeLockViewController: UIViewController, PasscodeLockTypeDelegat
     @IBOutlet open weak var deleteSignButton: UIButton?
     @IBOutlet open weak var touchIDButton: UIButton?
     @IBOutlet open weak var placeholdersX: NSLayoutConstraint?
+    @IBOutlet open weak var visualEffectView: UIVisualEffectView!
     
+    open var successCodeCallback: ((_ lock: PasscodeLockType, _ code: String) -> Void)?
     open var successCallback: ((_ lock: PasscodeLockType) -> Void)?
     open var dismissCompletionCallback: (()->Void)?
     open var animateOnDismiss: Bool
@@ -242,6 +244,16 @@ open class PasscodeLockViewController: UIViewController, PasscodeLockTypeDelegat
             self?.successCallback?(lock)
         })
     }
+    
+    open func passcodeLockDidSucceedWithCode(_ lock: PasscodeLockType, code: String) {
+        
+        deleteSignButton?.isEnabled = true
+        animatePlaceholders(placeholders, toState: .inactive)
+        dismissPasscodeLock(lock, completionHandler: { [weak self] _ in
+            self?.successCodeCallback?(lock, code)
+        })
+    }
+    
     
     open func passcodeLockDidFail(_ lock: PasscodeLockType) {
         
