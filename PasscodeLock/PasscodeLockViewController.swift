@@ -169,9 +169,9 @@ open class PasscodeLockViewController: UIViewController, PasscodeLockTypeDelegat
         // if presented as modal
         if presentingViewController?.presentedViewController == self {
             
+            self.dismissCompletionCallback?()
+            
             dismiss(animated: animateOnDismiss, completion: { [weak self] _ in
-                
-                self?.dismissCompletionCallback?()
                 
                 completionHandler?()
             })
@@ -249,9 +249,7 @@ open class PasscodeLockViewController: UIViewController, PasscodeLockTypeDelegat
         
         deleteSignButton?.isEnabled = true
         animatePlaceholders(placeholders, toState: .inactive)
-        dismissPasscodeLock(lock, completionHandler: { [weak self] _ in
-            self?.successCodeCallback?(lock, code)
-        })
+        self.successCodeCallback?(lock, code)
     }
     
     
