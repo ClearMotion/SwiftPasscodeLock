@@ -21,8 +21,8 @@ struct ConfirmPasscodeState: PasscodeLockStateType {
     init(allowCancellation: Bool = true) {
         
         isCancellableAction = allowCancellation
-        title = localizedStringFor("PasscodeLockEnterTitle", comment: "Enter passcode title")
-        description = localizedStringFor("PasscodeLockEnterDescription", comment: "Enter passcode description")
+        title = "Custom Tuning UI"
+        description = "Enter your vehicle dynamacist PIN."
     }
     
     mutating func acceptPasscode(_ passcode: [String], fromLock lock: PasscodeLockType) {
