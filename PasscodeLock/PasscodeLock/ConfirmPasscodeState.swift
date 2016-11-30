@@ -1,5 +1,5 @@
 //
-//  ConfirmPasscodeState.swift
+//  EnterPasscodeState.swift
 //  PasscodeLock
 //
 //  Created by Yanko Dimitrov on 8/28/15.
@@ -12,34 +12,50 @@ struct ConfirmPasscodeState: PasscodeLockStateType {
     
     let title: String
     let description: String
-    let isCancellableAction = true
-    var isTouchIDAllowed = false
+    let isCancellableAction: Bool
+    var isTouchIDAllowed = true
     
-    fileprivate var passcodeToConfirm: [String]
+    fileprivate var inccorectPasscodeAttempts = 0
+    fileprivate var isNotificationSent = false
     
-    init(passcode: [String]) {
+    init(allowCancellation: Bool = false) {
         
-        passcodeToConfirm = passcode
-        title = localizedStringFor("PasscodeLockConfirmTitle", comment: "Confirm passcode title")
-        description = localizedStringFor("PasscodeLockConfirmDescription", comment: "Confirm passcode description")
+        isCancellableAction = allowCancellation
+        title = localizedStringFor("PasscodeLockEnterTitle", comment: "Enter passcode title")
+        description = localizedStringFor("PasscodeLockEnterDescription", comment: "Enter passcode description")
     }
     
-    func acceptPasscode(_ passcode: [String], fromLock lock: PasscodeLockType) {
+    mutating func acceptPasscode(_ passcode: [String], fromLock lock: PasscodeLockType) {
         
-        if passcode == passcodeToConfirm {
+        guard let currentPasscode = lock.repository.passcode else {
+            return
+        }
+        
+        if passcode == currentPasscode {
             
-            lock.repository.savePasscode(passcode)
             lock.delegate?.passcodeLockDidSucceed(lock)
-        
+            
         } else {
             
-            let mismatchTitle = localizedStringFor("PasscodeLockMismatchTitle", comment: "Passcode mismatch title")
-            let mismatchDescription = localizedStringFor("PasscodeLockMismatchDescription", comment: "Passcode mismatch description")
+            inccorectPasscodeAttempts += 1
             
-            let nextState = SetPasscodeState(title: mismatchTitle, description: mismatchDescription)
+            if inccorectPasscodeAttempts >= lock.configuration.maximumInccorectPasscodeAttempts {
+                
+                postNotification()
+            }
             
-            lock.changeStateTo(nextState)
             lock.delegate?.passcodeLockDidFail(lock)
         }
+    }
+    
+    fileprivate mutating func postNotification() {
+        
+        guard !isNotificationSent else { return }
+        
+        let center = NotificationCenter.default
+        
+        center.post(name: Notification.Name(rawValue: PasscodeLockIncorrectPasscodeNotification), object: nil)
+        
+        isNotificationSent = true
     }
 }
